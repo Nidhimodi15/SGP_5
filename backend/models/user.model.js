@@ -32,20 +32,28 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.methods.generateJwtToken = function () {
-  const Token = jwt.sign(
+userSchema.methods.generateRefreshToken = function () {
+  return jwt.sign(
     {
       _id: this._id,
-      googleID: this.googleID,
-      email: this.email,
-      name: this.name,
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     }
   );
-  return Token;
+};
+
+userSchema.methods.generateAccessToken = function () {
+ return jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    }
+  );
 };
 
 const User = mongoose.model("User", userSchema);

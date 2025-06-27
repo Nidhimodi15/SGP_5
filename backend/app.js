@@ -4,21 +4,24 @@ dotenv.config();
 import cors from "cors"
 import connectToDb from "./db/connectToDB.js";
 import cookieParser from "cookie-parser";
+import userRouter from "./routes/user.route.js"
 
 const app = express()
 
 //db connection
-connectToDb();
 
 //Middlewares
 app.use(cors({
-    origin:"*"
+    origin:["http://localhost:5173","*"],
+    credentials: true  
 }))
-app.use(urlencoded({extended: true}))
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
+connectToDb();
 
-
+//user Routes
+app.use('/api/v1/user',userRouter)
 
 
 export default app
