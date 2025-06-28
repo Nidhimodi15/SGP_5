@@ -3,21 +3,20 @@ import axios from 'axios'
 import { GoogleLogin } from "@react-oauth/google";
 
 
-const Signup = () => {
+const Signin = () => {
 
   const handleLogin = async(credentialResponse)=>{
         try {
-          console.log(credentialResponse.credential)
-      const res = await axios.post("http://localhost:3000/api/v1/user/signup", {
+      const res = await axios.post("http://localhost:3000/api/v1/user/signin", {
         token: credentialResponse.credential,
       },
     {
       withCredentials:true
     });
 
-      localStorage.setItem("token", res.data.data.refreshToken);
+    //   localStorage.setItem("token", res.data.data.refreshToken);
       console.log("User Info:", res.data.data.User);
-      alert("Login successful!");
+    //   alert("Login successful!");
     } catch (err) {
       console.error("Login failed:", err);
     }
@@ -36,4 +35,4 @@ const Signup = () => {
   )
 }
 
-export default Signup
+export default Signin
