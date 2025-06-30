@@ -7,12 +7,14 @@ const Signin = () => {
 
   const handleLogin = async(credentialResponse)=>{
         try {
+          console.log(credentialResponse.credential)
       const res = await axios.post("http://localhost:3000/api/v1/user/signin", {
         token: credentialResponse.credential,
       },
     {
       withCredentials:true
     });
+    
 
     //   localStorage.setItem("token", res.data.data.refreshToken);
       console.log("User Info:", res.data.data.User);
@@ -36,3 +38,4 @@ const Signin = () => {
 }
 
 export default Signin
+

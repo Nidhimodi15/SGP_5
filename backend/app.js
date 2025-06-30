@@ -5,6 +5,7 @@ import cors from "cors"
 import connectToDb from "./db/connectToDB.js";
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/user.route.js"
+import projectRouter from "./routes/project.route.js";
 
 const app = express()
 
@@ -23,5 +24,7 @@ connectToDb();
 //user Routes
 app.use('/api/v1/user',userRouter)
 
+//project Routes
+app.use('/api/v1/project',projectRouter)
 
 export default app
