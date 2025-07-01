@@ -43,7 +43,7 @@ const createUser = async (req, res) => {
     });
 
     if (isUserExists) {
-      throw new apiError("User already exist with this Email or GoogleID");
+      throw new apiError("User already exist with this Email or GoogleID",400);
     }
 
     const newUser = await userModel.create({

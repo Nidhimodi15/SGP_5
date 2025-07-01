@@ -67,4 +67,54 @@ const createProjectFromPrompt = async (req, res) => {
   }
 };
 
-export {createProjectFromPrompt}
+const retriveAllProjects = async(req,res) =>{
+    try {
+
+        const userID = req.User;
+        const projectCreated = await projectModel.find({
+            owner:userID
+        })
+        if(!projectCreated)
+        {
+            console.log("No Projects Found")
+        }
+
+        return res.status(200)
+        .json(
+            new apiResponse(200,"Projects Retrived successfully",
+                {
+                    projectCreated
+                }
+            )
+        )
+        
+    } catch (error) {
+        throw new apiError("error while retriving projects",400,error)
+    }
+}
+
+const deleteProject = async(req,res) =>{
+    try {
+        const userID = req.User
+        const sessionId = req.params
+        if(!sessionId)
+        {
+            throw new apiError("Sessionid not found",404,[])
+        }
+        const deletedProject = await projectModel.findOne({owner:userID,sessionId:req.params.sessionId});
+        if(!deletedProject)
+        {
+            throw new apiError("Project not found",404,[])
+        }
+        await deletedProject.deleteOne()
+        return res.status(200)
+        .json(
+           new apiResponse(200,"project deleted successfully",deletedProject)
+        )
+        
+    } catch (error) {
+        throw new apiError("Error while deleting project",500,error)
+    }
+}
+
+export {createProjectFromPrompt,retriveAllProjects,deleteProject}

@@ -8,13 +8,13 @@ const authMiddleware = async (req,res,next) => {
         const accessToken = req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
         if(!accessToken)
         {
-            throw new apiError("Access Token not found")
+            throw new apiError("Access Token not found",404,[])
         }
 
         const decodedToken = jwt.verify(accessToken,process.env.ACCESS_TOKEN_SECRET);
         const User = await userModel.findById(decodedToken._id).select("-refreshToken")
         if(!User){
-            throw new apiError("User not found",404,[])
+            throw new apiError("Unauthorized User",400,[])
         }
         req.User=User
         next();
