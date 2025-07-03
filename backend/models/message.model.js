@@ -8,6 +8,10 @@ const messageSchema = new mongoose.Schema(
             ref:"Project",
             required:true
         },
+         sessionId:{
+            type:String,
+            required:true
+        },
         sender:{
             type:String,
             enum:["user","ai"],

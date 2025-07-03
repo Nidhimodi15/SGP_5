@@ -5,6 +5,7 @@ import apiResponse from "../utils/apiResponse.js";
 import { v4 as uuidv4 } from "uuid";
 import { generateSummaryAndName,generatePromptForCode,generateCodeFIles } from "../utils/aiGeneration.js";
 import codeFileModel from "../models/codeFiles.model.js";
+import mongoose from "mongoose";
 
 const createProjectFromPrompt = async (req, res) => {
   try {
@@ -25,11 +26,13 @@ const createProjectFromPrompt = async (req, res) => {
     }
     await messageModel.create({
         projectId:newProject._id,
+        sessionId:sessionId,
         sender:"user",
         message:prompt
     })
     await messageModel.create({
         projectId:newProject._id,
+        sessionId:sessionId,
         sender:"ai",
         message:summary
     })
@@ -39,6 +42,7 @@ const createProjectFromPrompt = async (req, res) => {
 
     const codeFile = await codeFileModel.create({
         projectID:newProject._id,
+        sessionId:sessionId,
         codeFiles:codeFilesOutput.files,
         dependencies:codeFilesOutput.dependencies
     })
@@ -47,6 +51,7 @@ const createProjectFromPrompt = async (req, res) => {
         throw new apiError("Error while adding code files to db ",500,[])
     }
     const code = await codeFileModel.findById(newProject._id)
+    console.log(code)
 
    
 
@@ -93,6 +98,58 @@ const retriveAllProjects = async(req,res) =>{
     }
 }
 
+const retriveProjectByIds = async(req,res) =>{
+    try {
+        
+        const {sessionID} = req.params
+        console.log(sessionID)
+        const ownerId = req.User._id
+
+        const retrivedProject = await projectModel.aggregate([
+            {
+                $match:{
+                        sessionId:sessionID,
+                }
+            },
+            {
+                $match:{
+                        owner:new mongoose.Types.ObjectId(ownerId),
+                }
+            },
+            {
+                $lookup:{
+                    from:"messages",
+                    localField:"sessionId",
+                    foreignField:"sessionId",
+                    as:"messages"
+                }
+            },
+            {
+                $lookup:{
+                    from:"codefiles",
+                    localField:"sessionId",
+                    foreignField:"sessionId",
+                    as:"codeFile"
+                }
+            }
+
+        ])
+        console.log(retrivedProject)
+
+        if(!retrivedProject.length)
+        {
+            throw new apiError("Cannot retrive project",400,[])
+        }
+        return res.status(200)
+        .json(
+            new apiResponse(200,"Project retrived",retrivedProject)
+        )
+
+    } catch (error) {
+        throw new apiError("Error while retriving project",400,error)
+    }
+}
+
 const deleteProject = async(req,res) =>{
     try {
         const userID = req.User
@@ -117,4 +174,4 @@ const deleteProject = async(req,res) =>{
     }
 }
 
-export {createProjectFromPrompt,retriveAllProjects,deleteProject}
+export {createProjectFromPrompt,retriveAllProjects,retriveProjectByIds,deleteProject}

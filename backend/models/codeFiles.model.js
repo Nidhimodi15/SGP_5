@@ -20,6 +20,10 @@ const codeFileSchema = new mongoose.Schema(
             ref:"Project",
             required:true
         },
+         sessionId:{
+            type:String,
+            required:true
+        },
         codeFiles:[fileSchema],
         dependencies:{
             type: Object,

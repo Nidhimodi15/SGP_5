@@ -3,8 +3,11 @@ import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
 import { Link } from "react-router-dom";
 import Signup from "./Signup";
+import { useNavigate } from "react-router-dom";
 
 const Signin = () => {
+
+  const navigate = useNavigate();
  const handleLogin = async(credentialResponse)=>{
         try {
           console.log(credentialResponse.credential)
@@ -16,8 +19,9 @@ const Signin = () => {
     });
     
 
-      // localStorage.setItem("token", res.data.data.refreshToken);
+      localStorage.setItem("token", res.data.data.refreshToken);
       console.log("User Info:", res.data.data.User);
+      navigate('/dashboard')
     } catch (err) {
       console.error("Login failed:", err);
     }
