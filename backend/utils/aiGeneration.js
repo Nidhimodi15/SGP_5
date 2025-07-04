@@ -5,12 +5,6 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 async function generateSummaryAndName(userPrompt) {
   const systemPrompt = `
-  RULES:
-- Do not add explanations.
-- Only output valid JSON.
-- and only return JSON output and no need to add any text,symbol,special character nothing only json output
-- Do NOT wrap the output in triple backticks or markdown. Return only raw JSON. 
-
 You're an expert web UI/UX designer and naming strategist.
 
 A user will give you a prompt describing the website they want.
@@ -23,6 +17,10 @@ You must reply in a clean JSON format like this:
 }
 
 RULES:
+- Do not add explanations.
+- Only output valid JSON.
+- and only return JSON output and no need to add any text,symbol,special character nothing only json output
+- Do NOT wrap the output in triple backticks or markdown. Return only raw JSON. 
 - Do not add explanations.
 - Only output valid JSON.
 - and only return JSON output and no need to add any text,symbol,special character nothing only json output
@@ -46,19 +44,6 @@ RULES:
 async function generatePromptForCode(summary) {
 
   const systemPrompt = `
-
-  RULES:
-- Only output valid JSON.
-- and only return JSON output and no need to add any text,symbol,special character nothing only json output
-- Do NOT wrap the output in triple backticks or markdown. Return only raw JSON.
-- Only output simple text and dont include special character and emojie
-- dont use *,# and dont make font bold
-- strictly dont use *,#
-Do not use triple backticks
-Do not use special characters or emojis
-Do not use asterisks or hash symbols
-Only return clean JSON that can be parsed directly
-
   You are a senior UI/UX design architect preparing a detailed and production-ready design specification for a modern React and Tailwind CSS website.
 
 You will receive a functional description of a feature or section that needs to be built. Your task is to transform that description into a clear and structured UI/UX design blueprint that can guide frontend developers or AI code generators.
@@ -130,7 +115,18 @@ RULES:
 Do not use triple backticks
 Do not use special characters or emojis
 Do not use asterisks or hash symbols
-Only return clean JSON that can be parsed directly`
+Only return clean JSON that can be parsed directly
+- Only output valid JSON.
+- and only return JSON output and no need to add any text,symbol,special character nothing only json output
+- Do NOT wrap the output in triple backticks or markdown. Return only raw JSON.
+- Only output simple text and dont include special character and emojie
+- dont use *,# and dont make font bold
+- strictly dont use *,#
+Do not use triple backticks
+Do not use special characters or emojis
+Do not use asterisks or hash symbols
+Only return clean JSON that can be parsed directly
+`
 
   const result = await model.generateContent(systemPrompt);
   const text = result.response.text();
@@ -154,6 +150,10 @@ Your task is to generate a complete, functional, and visually polished React fro
 "${aiMessage2}"
 
 Requirements:
+
+Make the UI visually appealing, clean, and responsive. Use Tailwind CSS if already used.
+
+Follow best practices including clean code structure, accessibility, and responsiveness.
 
 Build responsive, accessible, and modern UIs with exceptional user experience.
 
@@ -239,5 +239,104 @@ Only return the raw JSON object as described above.
   }
 }
 
+async function counterPrompt(contextCodeFiles,contextMessages,prompt) {
+  
+  // console.log(contextCodeFiles,contextMessages)
+ const systemPrompt = `
 
-export {generateSummaryAndName,generatePromptForCode,generateCodeFIles}
+RULES:
+- Only output valid JSON.
+- Only return JSON output and no additional text, symbols, or formatting.
+- Do NOT wrap the output in triple backticks or markdown. Return only raw JSON.
+- Do not use emojis, special characters, asterisks, hash symbols, or bold fonts.
+- Only return clean JSON that can be parsed directly.
+- Do not add any explanations or comments outside the JSON structure.
+- Make sure you are not changing the old code untill and unless mention in prompt if not return the exact old code for unchanged portion of code
+
+
+You are a professional full-stack JavaScript developer. Your task is to generate a complete modern web application based on the new prompt, while also understanding the context of previously built features.
+
+You will receive:
+
+1. codeFiles: A list of existing files with their relative paths and code content ${contextCodeFiles}.
+2. messages: A chat history between the user and assistant describing what changes or features were discussed previously ${contextMessages}.
+3. userPrompt: A new prompt describing the user’s updated or full project idea ${prompt}.
+
+Your responsibilities:
+
+- Analyze and extract context from previous messages and codeFiles.
+- Based on that, generate a **new full app** guided by the userPrompt.
+- You may re-use, enhance, or modify previous code files only if it aligns with the new app goal.
+- Keep file names and paths clean and logical (use folders like /components, /pages, /utils, etc.).
+- Ensure the UI is clean, responsive, and visually appealing (use Tailwind CSS if already used).
+- Follow best practices in code quality, file structure, accessibility, and performance.
+- Generate working and minimal versions of all essential files.
+- Do not include boilerplate like package.json unless explicitly asked.
+- you have to include the past code ${contextCodeFiles} + the new updated code and if you are not using the old code then return it same as the old code 
+- Make sure you are not changing the old code untill and unless mention in prompt if not return the exact old code for unchanged portion of code
+
+Output format:
+
+Return a valid JSON object with this structure (no markdown, no code blocks, no extra text):
+
+{
+  "airesponse": "Explain what the new app does and what files were created or modified.",
+  "updatedCode": [
+    {
+      "filename": "App.jsx",
+      "path": "src/App.jsx",
+      "content": "import React from 'react'; ... export default App;"
+    },
+    {
+      "filename": "Navbar.jsx",
+      "path": "src/components/Navbar.jsx",
+      "content": "..."
+    }
+    ...
+  ],
+  "dependencies": {
+"react": "^18.2.0",
+"react-dom": "^18.2.0",
+"tailwindcss": "^3.4.1",
+"autoprefixer": "^10.4.15",
+"postcss": "^8.4.21",
+"framer-motion": "^10.16.4",
+"lucide-react": "^0.263.0"
+// Add more if needed
+}
+}
+
+Important:
+
+- Do not wrap the JSON in any markdown formatting.
+- Do not include explanations outside the JSON.
+- Only return changed or newly added files inside updatedCode.
+- Do not generate duplicate or unused files.
+- Do not use emojis or markdown formatting.
+- Strictly output valid JSON only.
+- you have to include the past code ${contextCodeFiles} + the new updated code and if you are not using the old code then return it same as the old code 
+- Make sure you are not changing the old code untill and unless mention in prompt if not return the exact old code for unchanged portion of code
+- Ensure every file is self-contained, individually importable, and default-exported.
+
+Inputs available:
+
+codeFiles: Previous code files and content.
+messages: Previous instructions and responses.
+userPrompt: New app idea to build upon the existing base.
+
+`
+
+  const result = await model.generateContent(systemPrompt);
+  const text = result.response.text();
+
+  try {
+    const parsed = JSON.parse(text);
+    return parsed;
+  } catch (err) {
+    console.error("Failed to parse Gemini JSON response:", text);
+    throw new Error("Invalid Gemini response");
+  }
+}
+
+
+export {generateSummaryAndName,generatePromptForCode,generateCodeFIles,counterPrompt}
