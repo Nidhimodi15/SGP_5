@@ -1,9 +1,15 @@
 import React from 'react'
-
-const Dashboard = () => {
+import Hero from '../components/Hero';
+import WhyDevelopersLoveUs from '../components/WhyDevelopersLoveUs';
+import Pricing from '../components/Pricing.jsx';
+import Robot from '../components/robot.jsx';
+export default function Dashboard() {
   return (
-    <div>Dashboard</div>
+    <div>
+      <Hero />
+      <Robot />
+      <WhyDevelopersLoveUs />
+      <Pricing />
+    </div>
   )
-}
-
-export default Dashboard
+}``
