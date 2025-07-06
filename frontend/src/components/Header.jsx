@@ -15,16 +15,21 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/user/logout", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axios.post(
+        "http://localhost:3000/api/v1/user/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
 
       if (res.status === 200) {
         localStorage.removeItem("token");
         toast.success("Logged out successfully!");
-        setToken('');
+        setToken("");
         navigate("/signin");
       } else {
         toast.error("Failed to logout");

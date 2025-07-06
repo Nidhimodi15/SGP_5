@@ -3,7 +3,7 @@ import Spline from '@splinetool/react-spline';
 import TypingEffect from './TypingEffect';
 const Robot = () => {
   return (
-    <div className="flex justify-center bg-bg-dark items-center pt-10 pb-10 flex-col lg:flex-row gap-6">
+    <div className="flex justify-center bg-bg-dark items-center  pb-10 flex-col lg:flex-row gap-6">
       <TypingEffect />
 
         <Spline

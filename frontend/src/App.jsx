@@ -1,20 +1,24 @@
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import Signup from './pages/Signup';
-import Signin from './pages/Signin';
-import Dashboard from './pages/Dashboard';
-import WorkSpace from './pages/WorkSpace';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import AuthWrapper from './components/AuthWrapper'
-import './App.css';
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
+import Signup from "./pages/Signup";
+import Signin from "./pages/Signin";
+import Dashboard from "./pages/Dashboard";
+import WorkSpace from "./pages/WorkSpace";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import AuthWrapper from "./components/AuthWrapper";
+import "./App.css";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 // Layout wrapper to control Header/Footer visibility
 function AppLayout() {
   const location = useLocation();
-
-  // Hide header/footer only on `/workspace`
   const hideHeaderFooter = location.pathname === '/workspace';
 
   return (
@@ -26,9 +30,16 @@ function AppLayout() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/dashboard" element={<Dashboard />} />
-      {/* <AuthWrapper>   */}
-        <Route path="/workspace" element={<WorkSpace />} />
-      {/* </AuthWrapper> */}
+
+        {/* Protected Route with AuthWrapper */}
+        <Route
+          path="/workspace"
+          element={
+            <AuthWrapper>
+              <WorkSpace />
+            </AuthWrapper>
+          }
+        />
       </Routes>
 
       {!hideHeaderFooter && <Footer />}
@@ -36,7 +47,7 @@ function AppLayout() {
   );
 }
 
-// Main App with BrowserRouter
+
 function App() {
   return (
     <BrowserRouter>

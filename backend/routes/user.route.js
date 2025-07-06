@@ -3,7 +3,10 @@ import { Router } from "express"
 import { createUser,loginUser,getCurrentUser, updateUser} from "../controllers/user.controllers.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 import upload from "../middlewares/multer.middleware.js"
+import { logoutUser } from "../controllers/user.controllers.js";
+
 const router = Router();
+router.route("/logout").post(authMiddleware, logoutUser);
 
 router.route("/signup").post(createUser)
 router.route("/signin").post(loginUser)
