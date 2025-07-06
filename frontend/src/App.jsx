@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import WorkSpace from './pages/WorkSpace';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import AuthWrapper from './components/AuthWrapper'
 import './App.css';
 
 import { useEffect, useState } from 'react';
@@ -25,7 +26,9 @@ function AppLayout() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/dashboard" element={<Dashboard />} />
+      {/* <AuthWrapper>   */}
         <Route path="/workspace" element={<WorkSpace />} />
+      {/* </AuthWrapper> */}
       </Routes>
 
       {!hideHeaderFooter && <Footer />}

@@ -8,6 +8,7 @@ const Signup = () => {
 
   const handleSignup = async (credentialResponse) => {
     try {
+      console.log(credentialResponse)
       const res = await axios.post(
         'http://localhost:3000/api/v1/user/signup',
         {

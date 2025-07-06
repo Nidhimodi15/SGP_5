@@ -143,6 +143,21 @@ async function generateCodeFIles(aiMessage2) {
 
 
   const systemPrompt = `
+
+  RULES:
+- Only output valid JSON.
+- and only return JSON output and no need to add any text,symbol,special character nothing only json output
+- Do NOT wrap the output in triple backticks or markdown. Return only raw JSON.
+- Only output simple text and dont include special character and emojie
+- dont use *,# and dont make font bold
+- strictly dont use *,#
+Do not use triple backticks
+Do not use special characters or emojis
+Do not use asterisks or hash symbols
+Only return clean JSON that can be parsed directly
+- Only output valid JSON.
+- and only return JSON output and no need to add any text,symbol,special character nothing only json output
+- Do NOT wrap the output in triple backticks or markdown. Return only raw JSON.
  You are a senior frontend developer specializing in React and Tailwind CSS.
 
 Your task is to generate a complete, functional, and visually polished React frontend using Tailwind CSS based on the following design specification:
@@ -243,6 +258,21 @@ async function counterPrompt(contextCodeFiles,contextMessages,prompt) {
   
   // console.log(contextCodeFiles,contextMessages)
  const systemPrompt = `
+
+ RULES:
+- Only output valid JSON.
+- and only return JSON output and no need to add any text,symbol,special character nothing only json output
+- Do NOT wrap the output in triple backticks or markdown. Return only raw JSON.
+- Only output simple text and dont include special character and emojie
+- dont use *,# and dont make font bold
+- strictly dont use *,#
+Do not use triple backticks
+Do not use special characters or emojis
+Do not use asterisks or hash symbols
+Only return clean JSON that can be parsed directly
+- Only output valid JSON.
+- and only return JSON output and no need to add any text,symbol,special character nothing only json output
+- Do NOT wrap the output in triple backticks or markdown. Return only raw JSON.
 
 RULES:
 - Only output valid JSON.

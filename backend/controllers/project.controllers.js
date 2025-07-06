@@ -11,6 +11,9 @@ import {
 } from "../utils/aiGeneration.js";
 import codeFileModel from "../models/codeFiles.model.js";
 import mongoose from "mongoose";
+import userModel from "../models/user.model.js";
+import jwt from "jsonwebtoken";
+import sendInvite from "../utils/sendInviteMail.js";
 
 const createProjectFromPrompt = async (req, res) => {
   try {
@@ -83,7 +86,10 @@ const createCounterprompt = async (req, res) => {
       },
       {
         $match: {
-          owner: new mongoose.Types.ObjectId(ownerId),
+          $or: [
+            { owner: new mongoose.Types.ObjectId(ownerId) },
+            { collaborators: { $in: [new mongoose.Types.ObjectId(ownerId)] } },
+          ],
         },
       },
     ]);
@@ -107,7 +113,10 @@ const createCounterprompt = async (req, res) => {
       },
       {
         $match: {
-          owner: new mongoose.Types.ObjectId(ownerId),
+          $or: [
+            {owner: new mongoose.Types.ObjectId(ownerId)},
+            {collaborators: { $in: [new mongoose.Types.ObjectId(ownerId)] }},
+          ],
         },
       },
       {
@@ -151,7 +160,7 @@ const createCounterprompt = async (req, res) => {
       sender: "ai",
       message: updatedOutput.airesponse,
     });
-    console.log("ai message added")
+    console.log("ai message added");
 
     const codeFile = await codeFileModel.findOneAndUpdate(
       { sessionId: sessionID },
@@ -162,13 +171,13 @@ const createCounterprompt = async (req, res) => {
         },
       },
       {
-        new:true
+        new: true,
       }
     );
     if (!codeFile) {
       throw new apiError("Error while adding code files to db ", 500, []);
     }
-    console.log("code files added message added",codeFile)
+    console.log("code files added message added", codeFile);
 
     return res.status(200).json(
       new apiResponse(200, "counter prompt created successfully", {
@@ -185,7 +194,10 @@ const retriveAllProjects = async (req, res) => {
   try {
     const userID = req.User;
     const projectCreated = await projectModel.find({
-      owner: userID,
+      $or: [
+            { owner: new mongoose.Types.ObjectId(userID) },
+            { collaborators: { $in: [new mongoose.Types.ObjectId(userID)] } },
+          ],
     });
     if (!projectCreated) {
       console.log("No Projects Found");
@@ -215,8 +227,10 @@ const retriveProjectByIds = async (req, res) => {
       },
       {
         $match: {
-          owner: new mongoose.Types.ObjectId(ownerId),
-        },
+          $or: [
+            { owner: new mongoose.Types.ObjectId(ownerId) },
+            { collaborators: { $in: [new mongoose.Types.ObjectId(ownerId)] } },
+          ],        },
       },
       {
         $lookup: {
@@ -272,10 +286,128 @@ const deleteProject = async (req, res) => {
   }
 };
 
+const addcollaborator = async (req, res) => {
+  try {
+    const { collaboratorEmail } = req.body;
+    const { sessionID } = req.params;
+    const userID = req.User._id;
+    const senderName = req.User.name;
+
+    const project = await projectModel
+      .findOne({
+        sessionId: sessionID,
+      })
+      .populate("collaborators", "email");
+
+    console.log(project);
+    if (!project) {
+      throw new apiError("Cannot fetch the project");
+    }
+
+    const emailLower = collaboratorEmail.toLowerCase();
+
+    const isPending = project.pendingRequest.some(
+      (req) => req.email && req.email.toLowerCase() === emailLower
+    );
+
+    const isCollab = project.collaborators.some(
+      (u) => u.email && u.email.toLowerCase() === emailLower
+    );
+
+    if (isPending || isCollab) {
+      return res
+        .status(400)
+        .json({ message: "User already invited or a collaborator" });
+    }
+    const collaboratorUser = await userModel.findOne({
+      email: collaboratorEmail,
+    });
+
+    if (!collaboratorEmail) {
+      throw new apiError("User doesnot exist with this mail id", 404);
+    }
+
+    project.pendingRequest.push({ email: collaboratorEmail });
+    await project.save();
+
+    const inviteToken = jwt.sign(
+      {
+        _id: collaboratorUser._id,
+        email: collaboratorUser.email,
+        name: collaboratorUser.name,
+        profileIMG: collaboratorUser.profileIMG,
+      },
+      process.env.INVITE_SECRET_KEY,
+      {
+        expiresIn: process.env.INVITE_SECRET_KEY_EXPIRY,
+      }
+    );
+
+    const receiverName = collaboratorUser.name;
+    const inviteLink = `http://localhost:3000/api/v1/project/invite/accept/${inviteToken}/${sessionID}`;
+
+    await sendInvite(collaboratorEmail, senderName, receiverName, inviteLink);
+
+    const projectDetails = await projectModel.findOne({
+      sessionId: sessionID,
+    });
+
+    return res
+      .status(200)
+      .json(new apiResponse(200, "Invite sent succesfully", projectDetails));
+  } catch (error) {
+    throw new apiError("Error while sending collaboration", 500, error);
+  }
+};
+
+const acceptInvite = async (req, res) => {
+  try {
+    const { inviteToken, sessionID } = req.params;
+    const decodedInviter = jwt.verify(
+      inviteToken,
+      process.env.INVITE_SECRET_KEY
+    );
+    const project = await projectModel.findOne({
+      sessionId: sessionID,
+    });
+    const emailLower = decodedInviter.email.toLowerCase();
+
+    const isPending = project.pendingRequest.some(
+      (req) => req.email && req.email.toLowerCase() === emailLower
+    );
+
+    const isCollab = project.collaborators.some(
+      (u) => u.email && u.email.toLowerCase() === emailLower
+    );
+
+    if (!isPending) {
+      throw new apiError("User already invited as collaborator", 400, []);
+    }
+    if (isCollab) {
+      throw new apiError("User is already a collaborator", 400, []);
+    }
+
+    project.collaborators.push(decodedInviter._id);
+    project.pendingRequest = project.pendingRequest.filter(
+      (req) => req.email.toLowerCase() !== decodedInviter.email.toLowerCase()
+    );
+
+    await project.save();
+
+    return res
+      .status(200)
+      .json(new apiResponse(200, "User Invited successfully", project));
+  } catch (error) {
+    throw new apiError("Error while accepting invite", 500, error);
+  }
+};
+
 export {
   createProjectFromPrompt,
   createCounterprompt,
   retriveAllProjects,
   retriveProjectByIds,
+  addcollaborator,
   deleteProject,
+  acceptInvite,
 };

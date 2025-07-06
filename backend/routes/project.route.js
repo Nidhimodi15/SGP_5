@@ -5,6 +5,8 @@ import {
   createCounterprompt,
   retriveAllProjects,
   retriveProjectByIds,
+  addcollaborator,
+  acceptInvite,
   deleteProject,
 } from "../controllers/project.controllers.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
@@ -26,5 +28,11 @@ projectRouter
 projectRouter
   .route("/retriveProjectById/:sessionID")
   .post(authMiddleware, retriveProjectByIds);
+projectRouter
+  .route("/addcollaborator/:sessionID")
+  .post(authMiddleware,addcollaborator);
+projectRouter
+  .route("/invite/accept/:inviteToken/:sessionID")
+  .get(authMiddleware,acceptInvite);  
 
 export default projectRouter;

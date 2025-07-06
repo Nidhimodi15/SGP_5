@@ -15,7 +15,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/user/logout", {
+      const res = await axios.get("http://localhost:3000/user/logout", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -24,7 +24,7 @@ const Header = () => {
       if (res.status === 200) {
         localStorage.removeItem("token");
         toast.success("Logged out successfully!");
-        setToken(null);
+        setToken('');
         navigate("/signin");
       } else {
         toast.error("Failed to logout");
