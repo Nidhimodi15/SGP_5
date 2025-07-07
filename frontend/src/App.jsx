@@ -13,7 +13,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import AuthWrapper from "./components/AuthWrapper";
 import "./App.css";
-
+// import { UserDataContext } from './context/UserContext'
 
 // Layout wrapper to control Header/Footer visibility
 function AppLayout() {
