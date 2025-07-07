@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="col-span-1">
           <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-purple-300 bg-clip-text text-transparent">SaaSFlow</h2>
           <p className="text-text-muted mt-2 mb-4">
-                       Build, deploy, and scale your SaaS application with our AI-powered platform.
+           Build, deploy, and scale your SaaS application with our AI-powered platform.
           </p>
           <div className="flex space-x-4 text-sm text-text-muted">
             <a href="#" className="hover:text-accent">

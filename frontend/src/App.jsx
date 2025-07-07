@@ -12,13 +12,16 @@ import WorkSpace from "./pages/WorkSpace";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import AuthWrapper from "./components/AuthWrapper";
+import CodeAndPromptArea from "./components/codeAndPromptArea";
 import "./App.css";
 // import { UserDataContext } from './context/UserContext'
 
 // Layout wrapper to control Header/Footer visibility
 function AppLayout() {
   const location = useLocation();
-  const hideHeaderFooter = location.pathname === '/workspace';
+   const hideHeaderFooter =
+    location.pathname === "/workspace" ||
+    location.pathname === "/codeandpromptarea";
 
   return (
     <>
@@ -39,13 +42,20 @@ function AppLayout() {
             </AuthWrapper>
           }
         />
+        <Route
+          path="/codeandpromptarea"
+          element={
+            // <AuthWrapper>
+            <CodeAndPromptArea />
+            /* </AuthWrapper> */
+          }
+        />  
       </Routes>
 
       {!hideHeaderFooter && <Footer />}
     </>
   );
 }
-
 
 function App() {
   return (
