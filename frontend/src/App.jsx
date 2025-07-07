@@ -13,12 +13,15 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import AuthWrapper from "./components/AuthWrapper";
 import "./App.css";
-// import { UserDataContext } from './context/UserContext'
 
-// Layout wrapper to control Header/Footer visibility
+import { useEffect, useState } from "react";
+import CodeAndPromptArea from "./components/codeAndPromptArea";
+
 function AppLayout() {
   const location = useLocation();
-  const hideHeaderFooter = location.pathname === '/workspace';
+  const hideHeaderFooter =
+    location.pathname === "/workspace" ||
+    location.pathname === "/codeandpromptarea";
 
   return (
     <>
@@ -39,13 +42,20 @@ function AppLayout() {
             </AuthWrapper>
           }
         />
+        <Route
+          path="/codeandpromptarea"
+          element={
+            // <AuthWrapper>
+            <CodeAndPromptArea />
+            /* </AuthWrapper> */
+          }
+        />
       </Routes>
 
       {!hideHeaderFooter && <Footer />}
     </>
   );
 }
-
 
 function App() {
   return (

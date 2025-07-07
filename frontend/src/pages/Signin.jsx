@@ -1,19 +1,16 @@
-import React from "react";
-import axios from "axios";
-import { GoogleLogin } from "@react-oauth/google";
-import { Link, useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { UserDataContext } from "../context/UserContext";
+import React from 'react';
+import axios from 'axios';
+import { GoogleLogin } from '@react-oauth/google';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Signin = () => {
   const navigate = useNavigate();
-  const { user, setUser } = useContext(UserDataContext);
 
   const handleLogin = async (credentialResponse) => {
     try {
-      console.log(credentialResponse);
+      console.log(credentialResponse)
       const res = await axios.post(
-        "http://localhost:3000/api/v1/user/signin",
+        'http://localhost:3000/api/v1/user/signin',
         {
           token: credentialResponse.credential,
         },
@@ -21,22 +18,13 @@ const Signin = () => {
           withCredentials: true,
         }
       );
-       console.log(res.data.data.User)
-       if (res.status === 200) {
-        const data = res.data.data.User;
-        setUser({
-     googleID:data.googleID,
-     email:data.email,
-     name:data.name,
-     profileIMG:data.profileIMG
-  });
-        localStorage.setItem("user", JSON.stringify(data));
-        localStorage.setItem("token", res.data.data.refreshToken);
-        console.log("User Info:",user);
-        navigate("/dashboard");
-      }
+
+      localStorage.setItem('token', res.data.data.refreshToken);
+      console.log('User Info:', res.data.data.User);
+      alert('Login successful!');
+      navigate('/dashboard');
     } catch (err) {
-      console.error("Login failed:", err);
+      console.error('Login failed:', err);
     }
   };
 
@@ -51,13 +39,13 @@ const Signin = () => {
         <GoogleLogin
           onSuccess={handleLogin}
           onError={() => {
-            console.log("Google Login Failed");
+            console.log('Google Login Failed');
           }}
           useOneTap
         />
 
         <p className="mt-6 text-center text-sm text-text-muted">
-          Don’t have an account?{" "}
+          Don’t have an account?{' '}
           <Link to="/signup" className="text-accent hover:underline">
             Sign up
           </Link>

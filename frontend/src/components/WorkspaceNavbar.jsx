@@ -1,10 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-
 const WorkspaceNavbar = () => {
-
-
   return (
     <div className='h-16 flex items-center justify-between px-4 text-white border-b border-gray-800 bg-[#0f111a]'>
       <div className="flex items-center space-x-4">

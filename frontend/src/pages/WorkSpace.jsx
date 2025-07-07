@@ -1,40 +1,18 @@
 import React, { useState } from "react";
-import { Link ,useNavigate} from "react-router-dom"; // optional, if using React Router
+import { Link } from "react-router-dom"; // optional, if using React Router
 import { ArrowUp, ArrowUpRight } from "lucide-react";
-import axios from 'axios'
-import { useContext } from "react";
-import { UserDataContext } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
-const MainSection = () => {
-  const { user } = useContext(UserDataContext);
-  console.log(user)
-  console.log("hello")
+const MainSection = ({ user = { fullName: { firstName: "User" } } }) => {
   const [messages, setMessages] = useState("");
-  const token = localStorage.getItem('token')
+
   const navigate = useNavigate();
-  if(!token)
-  {
-    console.log("unauthorized User");
-    navigate('/signin')
-  }
 
-  const submitHandler = async (e) => {
+  const submitHandler = (e) => {
     e.preventDefault();
-    // alert(`Your idea: ${messages}`);
-    const response = await axios.post(
-      'http://localhost:3000/api/v1/project/createProjectFromPrompt',
-      { prompt: messages },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}` // if you are using auth
-        },
-        withCredentials: true // if cookies/session required
-      }
-    );
+    if (!messages.trim()) return;
 
-
-    console.log(response.data)
+    navigate("/codeandpromptarea", { state: { prompt: messages } });
   };
 
   return (
@@ -49,10 +27,10 @@ const MainSection = () => {
           </Link>
         </h1>
         <div className="flex items-center space-x-2  bg-pink-600 text-white px-4 py-2 mr-10 mt-4 rounded-full text-sm font-semibold">
-          {/* <span className="rounded-full bg-pink-700 w-6 h-6 flex items-center justify-center text-sm">
-            {user?.name || "User"}
-          </span> */}
-          <span>{user?.name}'s SaaSFlow</span>
+          <span className="rounded-full bg-pink-700 w-6 h-6 flex items-center justify-center text-sm">
+            {user.fullName?.firstName?.[0] || "U"}
+          </span>
+          <span>{user.fullName?.firstName}'s SaaSFlow</span>
         </div>
       </div>
 
