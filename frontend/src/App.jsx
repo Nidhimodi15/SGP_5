@@ -14,7 +14,6 @@ import Footer from "./components/Footer";
 import AuthWrapper from "./components/AuthWrapper";
 import "./App.css";
 
-import { useEffect, useState } from "react";
 
 // Layout wrapper to control Header/Footer visibility
 function AppLayout() {

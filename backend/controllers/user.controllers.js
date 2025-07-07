@@ -125,6 +125,23 @@ const loginUser = async (req, res) => {
   }
 };
 
+const logoutUser = async(req,res)=>{
+  try {
+
+    if(!req.User)
+    {
+      throw new apiError("User is not logged in")
+    }
+    
+    return res.status(200)
+    .json(
+      new apiResponse(200,"Logged out successfully")
+    )
+  } catch (error) {
+    throw new apiError("error while logout",400,error)
+  }
+}
+
 const getCurrentUser = async (req,res) =>{
   try {
     if(!req.User)
@@ -216,4 +233,4 @@ const updateUser = async (req,res) => {
   }
 }
 
-export {createUser,loginUser,getCurrentUser,updateUser};
+export {createUser,loginUser,getCurrentUser,updateUser,logoutUser};
